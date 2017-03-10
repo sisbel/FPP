@@ -3,6 +3,8 @@ package fpp;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 import twitter4j.IDs;
 import twitter4j.Twitter;
@@ -13,9 +15,10 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class FPPMain {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException{
 		long cursor = -1;
 		IDs ids;
+		Map <Long, User> userData = null;
 	
 		ConfigurationBuilder cfb = new ConfigurationBuilder();
 		cfb.setDebugEnabled(true)
@@ -31,18 +34,23 @@ public class FPPMain {
 			twitter.verifyCredentials();
 			
 			System.out.println("Listening, please wait...");
+			System.out.println();
 			do {
 				ids = twitter.getFollowersIDs("Isthil255", cursor);
+				userData = new HashMap();
 				for (long id : ids.getIDs()) {
 					System.out.println(id);
 					User user = twitter.showUser(id);
 					System.out.println(user.getName());
+					System.out.println();
+					userData.put(id, user);
 				}
 			}while ((cursor = ids.getNextCursor()) != 0);
 		}catch (TwitterException e) {
 			e.printStackTrace();
-		}
+		} // End try/catch
 		
+		CreateGML gml = new CreateGML(userData);
 	}
 
 }
